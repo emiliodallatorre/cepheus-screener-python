@@ -87,7 +87,7 @@ def main():
         DeviceModel(1242, 2688, "6.5"),
         # DeviceModel(1125, 2436, "5.8"),
         DeviceModel(1242, 2208, "5.5"),
-        # DeviceModel(1242, 2688, "6.5"),
+        DeviceModel(2048, 2732, "iPadPro12.9"),
     ]
 
     if not os.path.exists("result"):

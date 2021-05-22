@@ -272,3 +272,4 @@ pip-selfcheck.json
 *.PNG
 !/iPhoneX.png
 *.jpg
+.idea

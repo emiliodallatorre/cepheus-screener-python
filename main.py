@@ -14,8 +14,10 @@ def get_png_list() -> list:
     file_list: list = []
 
     for entity in os.listdir("."):
-        if os.path.isfile(entity) and entity.split(".")[1] == "png" and entity != "iPhoneX.png":
+        if os.path.isfile(entity) and (entity.split(".")[1].upper() == "PNG" or entity.split(".")[1].upper() == "JPG"):
             file_list.append(entity)
+
+    file_list.remove("iPhoneX.png")
 
     file_list.sort(key=lambda file: int(file.split("_")[1].split(".")[0]))
 
@@ -85,7 +87,7 @@ def main():
     delete_files()
 
     iphone_mockup: Image = load_iphone_mockup()
-    screenshot_path: list = get_png_list()
+    screenshot_paths: list = get_png_list()
 
     foreground_color: tuple = hex_to_rgb(input("Inserisci colore di foreground: ").lstrip("#"))
     background_color: tuple = hex_to_rgb(input("Inserisci colore di background: ").lstrip("#"))
@@ -100,12 +102,16 @@ def main():
     if not os.path.exists("result"):
         os.mkdir("result")
 
-    for screenshot in screenshot_path:
-        for device_size in device_sizes:
+    for device_size in device_sizes:
+        print(f"Comincio a processare le immagini per {device_size.name}...")
+        for screenshot in screenshot_paths:
+            print(
+                f"Siamo al {str(round(((screenshot_paths.index(screenshot) + 1) / len(screenshot_paths)), 4) * 100)}% per questo dispositivo.")
+
             if not os.path.exists(f"result/{device_size.name}/"):
                 os.mkdir(f"result/{device_size.name}/")
 
-            create_image_with_size(screenshot, iphone_mockup, project_name, screenshot_path.index(screenshot),
+            create_image_with_size(screenshot, iphone_mockup, project_name, screenshot_paths.index(screenshot),
                                    device_size, background_color, foreground_color)
 
 

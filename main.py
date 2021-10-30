@@ -14,7 +14,7 @@ def get_png_list() -> list:
     file_list: list = []
 
     for entity in os.listdir("."):
-        if os.path.isfile(entity) and entity.split(".")[1] == "PNG" and entity != "iPhoneX.png":
+        if os.path.isfile(entity) and entity.split(".")[1] == "png" and entity != "iPhoneX.png":
             file_list.append(entity)
 
     file_list.sort(key=lambda file: int(file.split("_")[1].split(".")[0]))
@@ -42,10 +42,11 @@ def resize_screenshot(screenshot: Image) -> Image:
 
 
 def create_image_with_size(screenshot_path: str, iphone_mockup: Image, project_name: str, index: int,
-                           device: DeviceModel) -> Image:
+                           device: DeviceModel, background_color: tuple, foreground_color: tuple) -> Image:
     final: Image = Image.new("RGBA", (device.width, device.height))
 
-    screenshot: Image = resize_screenshot(Image.open(screenshot_path))
+    screenshot: Image = resize_screenshot(Image.open(screenshot_path).convert('RGBA'))
+
     mockup: Image = Image.new("RGBA", iphone_mockup.size)
     mockup.alpha_composite(screenshot, dest=(623, 180))
     mockup.alpha_composite(iphone_mockup)
@@ -56,16 +57,15 @@ def create_image_with_size(screenshot_path: str, iphone_mockup: Image, project_n
     top_padding = (height - device.height) / 2
     bottom_padding = height - top_padding
 
-    cropped = mockup.crop((left_padding, top_padding, right_padding, bottom_padding))
+    cropped = mockup.crop(
+        (left_padding, top_padding, right_padding, bottom_padding))
     final.alpha_composite(cropped)
 
     if final.mode in ('RGBA', 'LA'):
-        gradient = Image.new('RGBA', final.size, color=(0,150,136))
+        gradient = Image.new('RGBA', final.size, color=foreground_color)
         draw = ImageDraw.Draw(gradient)
 
-        f_co = (77, 182, 172)
-        t_co = (0, 121, 107)
-        for i, color in enumerate(interpolate(f_co, t_co, final.width * 2)):
+        for i, color in enumerate(interpolate(foreground_color, background_color, final.width * 2)):
             draw.line([(i, 0), (0, i)], tuple(color), width=1)
 
         gradient.paste(final, final.split()[-1])
@@ -76,12 +76,19 @@ def create_image_with_size(screenshot_path: str, iphone_mockup: Image, project_n
                progressive=True)
 
 
+def hex_to_rgb(hex_color: str) -> tuple:
+    return tuple(int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
+
+
 def main():
-    project_name: str = "Bookaround"
+    project_name: str = input("Inserisci il nome del progetto: ")
     delete_files()
 
     iphone_mockup: Image = load_iphone_mockup()
     screenshot_path: list = get_png_list()
+
+    foreground_color: tuple = hex_to_rgb(input("Inserisci colore di foreground: ").lstrip("#"))
+    background_color: tuple = hex_to_rgb(input("Inserisci colore di background: ").lstrip("#"))
 
     device_sizes: list = [
         DeviceModel(1242, 2688, "6.5"),
@@ -99,7 +106,7 @@ def main():
                 os.mkdir(f"result/{device_size.name}/")
 
             create_image_with_size(screenshot, iphone_mockup, project_name, screenshot_path.index(screenshot),
-                                   device_size)
+                                   device_size, background_color, foreground_color)
 
 
 main()

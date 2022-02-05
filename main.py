@@ -47,7 +47,8 @@ def create_image_with_size(screenshot_path: str, iphone_mockup: Image, project_n
                            device: DeviceModel, background_color: tuple, foreground_color: tuple) -> Image:
     final: Image = Image.new("RGBA", (device.width, device.height))
 
-    screenshot: Image = resize_screenshot(Image.open(screenshot_path).convert('RGBA'))
+    screenshot: Image = resize_screenshot(
+        Image.open(screenshot_path).convert('RGBA'))
 
     mockup: Image = Image.new("RGBA", iphone_mockup.size)
     mockup.alpha_composite(screenshot, dest=(623, 180))
@@ -89,8 +90,10 @@ def main():
     iphone_mockup: Image = load_iphone_mockup()
     screenshot_paths: list = get_png_list()
 
-    foreground_color: tuple = hex_to_rgb(input("Inserisci colore di foreground: ").lstrip("#"))
-    background_color: tuple = hex_to_rgb(input("Inserisci colore di background: ").lstrip("#"))
+    foreground_color: tuple = hex_to_rgb(
+        input("Inserisci colore di foreground: ").lstrip("#"))
+    background_color: tuple = hex_to_rgb(
+        input("Inserisci colore di background: ").lstrip("#"))
 
     device_sizes: list = [
         DeviceModel(1242, 2688, "6.5"),
